@@ -24,4 +24,9 @@ document.addEventListener("selectstart", () => {
   );
 });
 
+let selectStartMousePosition = {
+  x: 0,
+  y: 0,
+};
+
 const range = selection?.getRangeAt?.(0);
