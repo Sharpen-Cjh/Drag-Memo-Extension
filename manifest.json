@@ -5,7 +5,7 @@
   "manifest_version": 3,
 
   "action": {
-    "default_icon": "pencil.png",
+    "default_icon": "/assets/images/edit.png",
     "default_popup": "popup.html"
   },
 
@@ -19,5 +19,5 @@
       "js": ["content.js"]
     }
   ],
-  "permissions": ["activeTab", "storage", "scripting", "tabs"]
+  "permissions": ["activeTab", "storage", "scripting", "tabs", "identity"]
 }
