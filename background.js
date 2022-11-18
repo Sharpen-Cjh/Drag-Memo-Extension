@@ -38,6 +38,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
       return;
     }
+
+    if (request.action === "patchMemo") {
+      try {
+        const memo = {
+          title: request.memoId,
+          description: request.innerText,
+        };
+        const response = await fetch(
+          `http://localhost:8080/memos/${request.memoId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json; charset=utf-8",
+            },
+            body: JSON.stringify(memo),
+          }
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
   })();
   return true;
 });
