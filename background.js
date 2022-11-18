@@ -55,9 +55,40 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             body: JSON.stringify(memo),
           }
         );
+
+        const result = await response.json();
+        sendResponse(result);
       } catch (error) {
+        sendResponse(error);
         console.log(error);
       }
+
+      return;
+    }
+
+    if (request.action === "deleteMemo") {
+      try {
+        const memoId = {
+          memoId: request.memoId,
+        };
+        const response = await fetch(
+          `http://localhost:8080/memos/${request.memoId}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json; charset=utf-8",
+            },
+          }
+        );
+        const result = await response.json();
+
+        sendResponse(result);
+      } catch (error) {
+        sendResponse(error);
+        console.log(error);
+      }
+
+      return;
     }
   })();
   return true;
