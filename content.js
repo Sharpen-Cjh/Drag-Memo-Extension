@@ -1,10 +1,9 @@
-const memoIcon = `<svg width="48px" height="48px" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="48" height="48" fill="white" fill-opacity="0.01"/>
-<path d="M8 6C8 4.89543 8.89543 4 10 4H30L40 14V42C40 43.1046 39.1046 44 38 44H10C8.89543 44 8 43.1046 8 42V6Z" fill="#2F88FF" stroke="black" stroke-width="4" stroke-linejoin="round"/>
-<path d="M16 20H32" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M16 28H32" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+const createMemoSvg = `<svg width="30px" height="30px" pointer-events="none" viewBox="-0.02 0 45.975 45.975" xmlns="http://www.w3.org/2000/svg">
+<path id="_15.Pencil" data-name="15.Pencil" d="M44.929,14.391a.955.955,0,0,1-.183.276L16.84,42.572a.949.949,0,0,1-.475.434L2.513,46.886a.682.682,0,0,1-.094.026l-.047.014c-.008,0-.017,0-.024,0a1.061,1.061,0,0,1-.286.045.926.926,0,0,1-.282-.041c-.021-.006-.04,0-.061-.009s-.013-.01-.021-.013a.94.94,0,0,1-.24-.141.885.885,0,0,1-.113-.086.884.884,0,0,1-.086-.113.952.952,0,0,1-.141-.24.239.239,0,0,1-.013-.021c-.007-.02,0-.04-.009-.061a.985.985,0,0,1-.041-.281,1.1,1.1,0,0,1,.045-.287c0-.008,0-.016,0-.023l.014-.049c.011-.03.013-.063.026-.093l3.88-13.852a.954.954,0,0,1,.434-.475L32.937,3.71c.04-.045.087-.083.128-.127l.3-.3c.015-.015.034-.02.05-.034A8.016,8.016,0,0,1,44.929,14.391ZM41.15,15.5l-3.619-3.619L13.891,35.522c0,.008.014.011.018.019l2.373,4.827ZM3.559,44.473l2.785-.779L4.338,41.689ZM4.943,39.53,8.5,43.089l6.12-1.715S12.035,36,12.031,36L6.657,33.41Zm7.547-5.406c.008,0,.011.013.019.018L36.15,10.5,32.531,6.881,7.663,31.749ZM38.922,3a6.073,6.073,0,0,0-4.489,1.994l-.007-.007-.514.513,8.619,8.619.527-.528-.006-.006A6.091,6.091,0,0,0,38.922,3Z" transform="translate(-1.055 -1)" fill-rule="evenodd"/>
 </svg>
 `;
+
+const getMemoSvg = `<svg width="30px" height="30px" pointer-events="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><style>.c{fill:none;stroke:#1237a5;stroke-linecap:round;stroke-linejoin:round;}</style></defs><g id="a"/><g id="b"><path class="c" d="M16.58,10.03c0,3.62-2.93,6.55-6.55,6.55s-6.55-2.93-6.55-6.55S6.41,3.47,10.03,3.47s6.55,2.93,6.55,6.55Z"/><line class="c" x1="14.82" x2="20.53" y1="14.78" y2="20.53"/></g></svg>`;
 
 const saveIcon = `<svg width="25px" height="25px" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="48" height="48" fill="white" fill-opacity="0.01"/>
@@ -25,55 +24,69 @@ const closeIcon = `<svg width="25px" height="25px" viewBox="0 0 48 48" fill="non
 </svg>
 `;
 
-const copyObject = (obj) => {
-  const result = {};
-
-  for (let key in obj) {
-    if (typeof obj[key] === "object") {
-      result[key] = copyObject(obj[key]);
-    } else {
-      result[key] = obj[key];
-    }
-  }
-
-  return result;
-};
-
-let mousePosition = {
-  x: 0,
-  y: 0,
-};
-
 window.onload = () => {
-  const renderMemoIcon = (event) => {
-    const selection = window.getSelection();
-    const selectionText = selection.toString();
+  const renderMemoIcon = (event, selectionText) => {
+    const toolBox = document.createElement("div");
+    const createMemoIcon = document.createElement("div");
+    const getMemoIcon = document.createElement("div");
 
-    if (selection.toString()) {
-      const iconBox = document.createElement("div");
+    toolBox.style.display = "flex";
+    toolBox.style.flexDirection = "row";
+    toolBox.style.width = "60px";
+    toolBox.style.position = "absolute";
+    toolBox.style.left = `${event.pageX}px`;
+    toolBox.style.top = `${event.pageY}px`;
+    toolBox.style.zIndex = 10;
+    toolBox.setAttribute("id", "tool-box");
 
-      iconBox.style.left = `${event.pageX}px`;
-      iconBox.style.top = `${event.pageY}px`;
-      iconBox.style.display = "block";
-      iconBox.style.position = "absolute";
-      iconBox.style.zIndex = 7;
+    createMemoIcon.style.zIndex = 11;
+    createMemoIcon.innerHTML = createMemoSvg;
+    createMemoIcon.setAttribute("class", "create-memo-button");
 
-      iconBox.innerHTML = memoIcon;
-      iconBox.addEventListener("click", () => {
-        chrome.runtime.sendMessage(null, selectionText);
+    createMemoIcon.addEventListener("click", function clickIconBox() {
+      chrome.runtime.sendMessage(
+        {
+          action: "createMemo",
+          selectionText,
+        },
+        (response) => {
+          if (response.success) {
+            window.alert("메모가 생성되었습니다.");
 
-        renderMemoEditor(event, selectionText);
+            renderMemoEditor(event, selectionText);
 
-        iconBox.style.display = "none";
-      });
+            toolBox.parentNode.removeChild(toolBox);
 
-      document.body.appendChild(iconBox);
-    }
+            return;
+          } else {
+            window.alert("이미 존재하는 메모입니다.");
+
+            toolBox.parentNode.removeChild(toolBox);
+          }
+        }
+      );
+    });
+
+    getMemoIcon.innerHTML = getMemoSvg;
+
+    toolBox.appendChild(getMemoIcon);
+    toolBox.appendChild(createMemoIcon);
+
+    document.body.appendChild(toolBox);
   };
 
-  const renderMemoEditor = (event, selectionText) => {
+  const renderMemoEditor = (event, title) => {
+    const hasMemo = document.getElementById(title);
+
+    if (hasMemo) {
+      hasMemo.style.display = "flex";
+
+      return;
+    }
+
     const memoEditorContainer = document.createElement("div");
     const memoEditorHeader = document.createElement("div");
+    const memoTitle = document.createElement("div");
     const memoSaveButton = document.createElement("div");
     const memoCloseButton = document.createElement("div");
     const memoEditor = document.createElement("div");
@@ -90,7 +103,7 @@ window.onload = () => {
     memoEditorContainer.style.zIndex = 8;
     memoEditorContainer.style.borderRadius = "5px";
     memoEditorContainer.setAttribute("class", "memoEditor-container");
-    memoEditorContainer.setAttribute("id", selectionText);
+    memoEditorContainer.setAttribute("id", title);
 
     memoEditorHeader.style.width = "300px";
     memoEditorHeader.style.height = "30px";
@@ -101,21 +114,25 @@ window.onload = () => {
     memoEditorHeader.style.border = "1px solid #e2e2e2";
     memoEditorHeader.setAttribute("class", "memoEditor-header");
 
+    memoTitle.style.width = "240px";
+    memoTitle.style.height = "30px";
+    memoTitle.style.color = "black";
+    memoTitle.style.fontSize = "small";
+    memoTitle.style.textAlign = "center";
+    memoTitle.style.justifyContent = "center";
+    memoTitle.textContent = title;
+
     memoSaveButton.style.width = "30px";
     memoSaveButton.style.height = "30px";
-    memoSaveButton.style.fontSize = "small";
-    memoSaveButton.style.textAlign = "center";
-    memoSaveButton.textContent = "Save";
     memoSaveButton.innerHTML = saveIcon;
     memoSaveButton.setAttribute("class", "memo-save-button");
 
     memoCloseButton.style.width = "30px";
     memoCloseButton.style.height = "30px";
-    memoCloseButton.style.fontSize = "small";
-    memoCloseButton.style.textAlign = "center";
-    memoCloseButton.textContent = "Close";
     memoCloseButton.innerHTML = closeIcon;
-    memoCloseButton.addEventListener("click", closeMemo);
+    memoCloseButton.addEventListener("click", () => {
+      closeMemo(title);
+    });
     memoCloseButton.setAttribute("class", "memo-close-button");
 
     memoEditor.style.width = "300px";
@@ -125,23 +142,27 @@ window.onload = () => {
     memoEditorContainer.appendChild(memoEditorHeader);
     memoEditorContainer.appendChild(memoEditor);
     memoEditorHeader.appendChild(memoSaveButton);
+    memoEditorHeader.appendChild(memoTitle);
     memoEditorHeader.appendChild(memoCloseButton);
 
     document.body.appendChild(memoEditorContainer);
   };
 
-  const setMousePosition = (x, y) => {
-    (mousePosition.x = x), (mousePosition.y = y);
+  const closeMemo = (memoEditorId) => {
+    document.getElementById(memoEditorId).style.display = "none";
   };
 
-  const closeMemo = () => {
-    document.querySelector(".memoEditor-container").style.display = "none";
-  };
+  document.addEventListener("mouseup", (event) => {
+    const selection = window.getSelection();
+    const selectionText = selection.toString().trim();
+    const toolBox = document.getElementById("tool-box");
 
-  document.addEventListener("mousedown", (event) => {
-    const { x, y } = event;
-    setMousePosition(x, y);
+    if (selectionText) {
+      renderMemoIcon(event, selectionText);
+
+      return;
+    } else if (toolBox !== event.target.parentNode) {
+      toolBox?.parentNode.removeChild(toolBox);
+    }
   });
-
-  document.addEventListener("mouseup", renderMemoIcon);
 };

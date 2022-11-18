@@ -30,3 +30,17 @@ let selectStartMousePosition = {
 };
 
 const range = selection?.getRangeAt?.(0);
+
+const copyObject = (obj) => {
+  const result = {};
+
+  for (let key in obj) {
+    if (typeof obj[key] === "object") {
+      result[key] = copyObject(obj[key]);
+    } else {
+      result[key] = obj[key];
+    }
+  }
+
+  return result;
+};
