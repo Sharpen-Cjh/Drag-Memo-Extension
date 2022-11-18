@@ -13,11 +13,30 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           body: JSON.stringify(memo),
         });
         const result = await response.json();
+
         sendResponse(result);
       } catch (error) {
         sendResponse(error);
         console.log(error);
       }
+
+      return;
+    }
+
+    if (request.action === "getMemo") {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/memos/${request.selectionText}`
+        );
+        const result = await response.json();
+
+        sendResponse(result);
+      } catch (error) {
+        sendResponse(error);
+        console.log(error);
+      }
+
+      return;
     }
   })();
   return true;
