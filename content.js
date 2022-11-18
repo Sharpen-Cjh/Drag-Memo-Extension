@@ -25,7 +25,7 @@ const closeIcon = `<svg width="25px" height="25px" viewBox="0 0 48 48" fill="non
 `;
 
 window.onload = () => {
-  const renderMemoIcon = (event, selectionText) => {
+  const renderToolBoxIcon = (event, selectionText) => {
     const toolBox = document.createElement("div");
     const createMemoIcon = document.createElement("div");
     const getMemoIcon = document.createElement("div");
@@ -43,7 +43,7 @@ window.onload = () => {
     createMemoIcon.innerHTML = createMemoSvg;
     createMemoIcon.setAttribute("class", "create-memo-button");
 
-    createMemoIcon.addEventListener("click", function clickIconBox() {
+    createMemoIcon.addEventListener("click", () => {
       chrome.runtime.sendMessage(
         {
           action: "createMemo",
@@ -52,7 +52,6 @@ window.onload = () => {
         (response) => {
           if (response.success) {
             window.alert("메모가 생성되었습니다.");
-
             renderMemoEditor(event, selectionText);
 
             toolBox.parentNode.removeChild(toolBox);
@@ -67,7 +66,29 @@ window.onload = () => {
       );
     });
 
+    getMemoIcon.style.zIndex = 11;
     getMemoIcon.innerHTML = getMemoSvg;
+    getMemoIcon.setAttribute("class", "get-memo-button");
+
+    getMemoIcon.addEventListener("click", () => {
+      chrome.runtime.sendMessage(
+        { action: "getMemo", selectionText },
+        (response) => {
+          if (response.success && response.memo !== null) {
+            const memo = response.memo;
+            const { title, description } = memo;
+
+            renderMemoEditor(event, title, description);
+            toolBox.parentNode.removeChild(toolBox);
+
+            return;
+          } else {
+            window.alert("해당 메모를 찾지 못했습니다. 메모를 생성하세요");
+            toolBox.parentNode.removeChild(toolBox);
+          }
+        }
+      );
+    });
 
     toolBox.appendChild(getMemoIcon);
     toolBox.appendChild(createMemoIcon);
@@ -75,7 +96,7 @@ window.onload = () => {
     document.body.appendChild(toolBox);
   };
 
-  const renderMemoEditor = (event, title) => {
+  const renderMemoEditor = (event, title, description) => {
     const hasMemo = document.getElementById(title);
 
     if (hasMemo) {
@@ -138,6 +159,7 @@ window.onload = () => {
     memoEditor.style.width = "300px";
     memoEditor.style.height = "270px";
     memoEditor.contentEditable = "true";
+    memoEditor.textContent = description;
 
     memoEditorContainer.appendChild(memoEditorHeader);
     memoEditorContainer.appendChild(memoEditor);
@@ -158,7 +180,7 @@ window.onload = () => {
     const toolBox = document.getElementById("tool-box");
 
     if (selectionText) {
-      renderMemoIcon(event, selectionText);
+      renderToolBoxIcon(event, selectionText);
 
       return;
     } else if (toolBox !== event.target.parentNode) {
