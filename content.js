@@ -159,7 +159,8 @@ window.onload = () => {
     memoEditor.style.width = "300px";
     memoEditor.style.height = "270px";
     memoEditor.contentEditable = "true";
-    memoEditor.textContent = description;
+    memoEditor.setAttribute("class", "memo-editor");
+    memoEditor.innerText = description;
 
     memoEditorContainer.appendChild(memoEditorHeader);
     memoEditorContainer.appendChild(memoEditor);
@@ -170,8 +171,17 @@ window.onload = () => {
     document.body.appendChild(memoEditorContainer);
   };
 
-  const closeMemo = (memoEditorId) => {
-    document.getElementById(memoEditorId).style.display = "none";
+  const closeMemo = (memoId) => {
+    const { innerText } = document.getElementsByClassName("memo-editor")[0];
+    const memoEditorContainer = document.getElementById(memoId);
+
+    chrome.runtime.sendMessage({
+      action: "patchMemo",
+      memoId,
+      innerText,
+    });
+
+    memoEditorContainer.parentNode.removeChild(memoEditorContainer);
   };
 
   document.addEventListener("mouseup", (event) => {
