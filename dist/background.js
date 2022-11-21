@@ -5,13 +5,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const memo = {
           title: request.selectionText,
         };
-        const response = await fetch("http://localhost:8080/memos", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json; charset=utf-8",
-          },
-          body: JSON.stringify(memo),
-        });
+        const { googleId, idToken } = request.userInfo.userInfo;
+        const response = await fetch(
+          `http://localhost:8080/users/${googleId}/memo`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json; charset=utf-8",
+              Authorization: `Bearer ${idToken}`,
+            },
+            body: JSON.stringify(memo),
+          }
+        );
         const result = await response.json();
 
         sendResponse(result);
@@ -25,8 +30,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     if (request.action === "getMemo") {
       try {
+        const { googleId, idToken } = request.userInfo.userInfo;
         const response = await fetch(
-          `http://localhost:8080/memos/${request.selectionText}`
+          `http://localhost:8080/users/${googleId}/memos/${request.selectionText}`,
+          {
+            headers: {
+              "Content-Type": "application/json; charset=utf-8",
+              Authorization: `Bearer ${idToken}`,
+            },
+          }
         );
         const result = await response.json();
 
@@ -45,18 +57,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           title: request.memoId,
           description: request.innerText,
         };
+        const { googleId, idToken } = request.userInfo.userInfo;
         const response = await fetch(
-          `http://localhost:8080/memos/${request.memoId}`,
+          `http://localhost:8080/users/${googleId}/memos/${request.memoId}`,
           {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json; charset=utf-8",
+              Authorization: `Bearer ${idToken}`,
             },
             body: JSON.stringify(memo),
           }
         );
-
         const result = await response.json();
+
         sendResponse(result);
       } catch (error) {
         sendResponse(error);
@@ -68,9 +82,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     if (request.action === "deleteMemo") {
       try {
-        const memoId = {
-          memoId: request.memoId,
-        };
         const response = await fetch(
           `http://localhost:8080/memos/${request.memoId}`,
           {
@@ -91,5 +102,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return;
     }
   })();
+
   return true;
 });
