@@ -14,8 +14,9 @@ const auth = getAuth(firebaseApp);
 setPersistence(auth, browserLocalPersistence);
 
 function init() {
-  onAuthStateChanged(auth, (user) => {
-    if (user != null) {
+  chrome.storage.local.get("userInfo", (userInfo) => {
+    console.log(userInfo);
+    if (Object.keys(userInfo).length !== 0) {
       window.location.replace("./main.html");
 
       return;
@@ -24,12 +25,8 @@ function init() {
 }
 init();
 
-document.querySelector(".btn__google").addEventListener("click", () => {
+document.querySelector(".button-google").addEventListener("click", () => {
   initFirebaseApp();
-});
-
-document.querySelector(".btn__homePage").addEventListener("click", () => {
-  window.open("http://localhost:3000/");
 });
 
 function initFirebaseApp() {
@@ -52,10 +49,8 @@ function startSignIn() {
 }
 
 function startAuth(interactive) {
-  console.log("Auth trying");
   chrome.identity.getAuthToken({ interactive: true }, function (token) {
     if (chrome.runtime.lastError && !interactive) {
-      console.log("It was not possible to get a token programmatically.");
     } else if (chrome.runtime.lastError) {
       console.error(chrome.runtime.lastError);
     } else if (token) {

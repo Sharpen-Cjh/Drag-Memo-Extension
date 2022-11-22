@@ -1,72 +1,64 @@
-@import "https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css";
 body {
-  display: block;
+  display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
-  background: linear-gradient(#fff, #3c76b8);
-  font-family: "Lato", sans-serif;
+  background-color: #ffffff;
   width: 300px;
   height: 230px;
 }
 
 h1 {
-  color: #3c76b8;
+  color: #0d6efd;
   text-align: center;
-  font-size: 40px;
+  font-size: 30px;
   font-weight: 100;
   margin: 0 0 30px;
-  padding-left: 10px;
-  padding-top: 5px;
+  padding: 0;
 }
 
-.btn {
+.button-logout {
   display: block;
   border: 1px solid transparent;
-  height: 35px;
+  height: 45px;
   width: 100%;
   border-radius: 5px;
   transition: all 0.5s ease;
   cursor: pointer;
   outline: none;
   font-family: "Lato", sans-serif;
-  font-weight: 600;
-  margin: 0 0 30px;
-}
-.btn__color{
-  display: flex;
-  border: 0px transparent;
-  height: 50px;
-  border-radius: 5px;
-  cursor: pointer;
-  outline: none;
-}
-
-.btn__sign_out {
-  background-color: #4285F4;
+  font-weight: 50px;
+  background-color: #0d6efd;
   color: #fff;
   font-size: 18px;
 }
 
-.btn__sign_out:hover {
+.button-logout:hover {
   background-color: #fff;
-  color: #4285F4;
-  border: 1px solid #4285F4;
+  color: #0d6efd;
+  border: 1px solid #0d6efd;
 }
 
-#sign_out{
+.button-homePage {
+  display: block;
+  border: 1px solid transparent;
+  height: 45px;
   width: 100%;
+  border: 1px solid #0d6efd;
+  border-radius: 5px;
+  transition: all 0.5s ease;
+  cursor: pointer;
+  margin-top: 10px;
+  outline: none;
+  font-family: "Lato", sans-serif;
+  font-weight: 50px;
+  background-color: #fff;
+  color: #0d6efd;
+  font-size: 18px;
 }
 
-@keyframes choosing {
-    100% {
-        transform: rotate(0deg) scale(1.5);
-        box-shadow: 0px 0px 20px 2px white; ;
-    }
-}
-
-#sign_out:hover {
-    animation-name: choosing;
-    animation-direction: normal;
-    animation-fill-mode: forwards;
-    animation-duration: 0.4s;
+.button-homePage:hover {
+  background-color: #0d6efd;
+  color: #fff;
+  border: 1px solid #0d6efd;
 }

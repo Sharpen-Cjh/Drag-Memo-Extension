@@ -12347,12 +12347,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const config = {
-  apiKey: "AIzaSyALCcg7_abRlVxpbmDDISAdWe9ecfEoQPs",
-  authDomain: "memo-extension-backend.firebaseapp.com",
-  projectId: "memo-extension-backend",
-  storageBucket: "memo-extension-backend.appspot.com",
-  messagingSenderId: "25897371936",
-  appId: "1:25897371936:web:4469531051b1b62a63af45",
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: "",
 };
 
 const firebaseApp = (0,firebase_app__WEBPACK_IMPORTED_MODULE_0__.initializeApp)(config);
@@ -14401,6 +14401,7 @@ const auth = (0,firebase_auth__WEBPACK_IMPORTED_MODULE_1__.getAuth)(_firebase_co
       },
       body: JSON.stringify(userInfo),
     });
+    console.log(status);
 
     status === 200
       ? chrome.storage.local.set({ userInfo })
@@ -14410,12 +14411,11 @@ const auth = (0,firebase_auth__WEBPACK_IMPORTED_MODULE_1__.getAuth)(_firebase_co
   }
 });
 
-document.querySelector("#sign_out").addEventListener("click", () => {
+document.querySelector(".button-logout").addEventListener("click", async () => {
   auth.signOut();
 
   chrome.storage.local.clear(() => {
     const error = chrome.runtime.lastError;
-
     if (error) {
       console.log(error);
 
@@ -14423,6 +14423,10 @@ document.querySelector("#sign_out").addEventListener("click", () => {
     }
   });
   window.location.replace("./popup.html");
+});
+
+document.querySelector(".button-homePage").addEventListener("click", () => {
+  window.open("http://localhost:3000/");
 });
 
 })();

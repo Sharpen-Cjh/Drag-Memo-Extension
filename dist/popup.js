@@ -12347,12 +12347,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const config = {
-  apiKey: "AIzaSyALCcg7_abRlVxpbmDDISAdWe9ecfEoQPs",
-  authDomain: "memo-extension-backend.firebaseapp.com",
-  projectId: "memo-extension-backend",
-  storageBucket: "memo-extension-backend.appspot.com",
-  messagingSenderId: "25897371936",
-  appId: "1:25897371936:web:4469531051b1b62a63af45",
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: "",
 };
 
 const firebaseApp = (0,firebase_app__WEBPACK_IMPORTED_MODULE_0__.initializeApp)(config);
@@ -14389,8 +14389,9 @@ const auth = (0,firebase_auth__WEBPACK_IMPORTED_MODULE_1__.getAuth)(_firebase_co
 (0,firebase_auth__WEBPACK_IMPORTED_MODULE_1__.setPersistence)(auth, firebase_auth__WEBPACK_IMPORTED_MODULE_1__.browserLocalPersistence);
 
 function init() {
-  (0,firebase_auth__WEBPACK_IMPORTED_MODULE_1__.onAuthStateChanged)(auth, (user) => {
-    if (user != null) {
+  chrome.storage.local.get("userInfo", (userInfo) => {
+    console.log(userInfo);
+    if (Object.keys(userInfo).length !== 0) {
       window.location.replace("./main.html");
 
       return;
@@ -14399,12 +14400,8 @@ function init() {
 }
 init();
 
-document.querySelector(".btn__google").addEventListener("click", () => {
+document.querySelector(".button-google").addEventListener("click", () => {
   initFirebaseApp();
-});
-
-document.querySelector(".btn__homePage").addEventListener("click", () => {
-  window.open("http://localhost:3000/");
 });
 
 function initFirebaseApp() {
@@ -14427,10 +14424,8 @@ function startSignIn() {
 }
 
 function startAuth(interactive) {
-  console.log("Auth trying");
   chrome.identity.getAuthToken({ interactive: true }, function (token) {
     if (chrome.runtime.lastError && !interactive) {
-      console.log("It was not possible to get a token programmatically.");
     } else if (chrome.runtime.lastError) {
       console.error(chrome.runtime.lastError);
     } else if (token) {
