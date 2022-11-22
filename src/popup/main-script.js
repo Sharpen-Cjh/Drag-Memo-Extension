@@ -19,6 +19,7 @@ onAuthStateChanged(auth, async (user) => {
       },
       body: JSON.stringify(userInfo),
     });
+    console.log(status);
 
     status === 200
       ? chrome.storage.local.set({ userInfo })
@@ -28,12 +29,11 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-document.querySelector("#sign_out").addEventListener("click", () => {
+document.querySelector(".button-logout").addEventListener("click", async () => {
   auth.signOut();
 
   chrome.storage.local.clear(() => {
     const error = chrome.runtime.lastError;
-
     if (error) {
       console.log(error);
 
@@ -41,4 +41,8 @@ document.querySelector("#sign_out").addEventListener("click", () => {
     }
   });
   window.location.replace("./popup.html");
+});
+
+document.querySelector(".button-homePage").addEventListener("click", () => {
+  window.open("http://localhost:3000/");
 });

@@ -4226,12 +4226,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const config = {
-  apiKey: "AIzaSyALCcg7_abRlVxpbmDDISAdWe9ecfEoQPs",
-  authDomain: "memo-extension-backend.firebaseapp.com",
-  projectId: "memo-extension-backend",
-  storageBucket: "memo-extension-backend.appspot.com",
-  messagingSenderId: "25897371936",
-  appId: "1:25897371936:web:4469531051b1b62a63af45",
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: "",
 };
 
 const firebaseApp = (0,firebase_app__WEBPACK_IMPORTED_MODULE_0__.initializeApp)(config);
