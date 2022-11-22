@@ -30,20 +30,54 @@ window.onload = () => {
     const toolBox = document.createElement("div");
     const createMemoIcon = document.createElement("div");
     const getMemoIcon = document.createElement("div");
+    const showHighLightIcon = document.createElement("div");
 
     toolBox.style.display = "flex";
     toolBox.style.flexDirection = "row";
     toolBox.style.width = "60px";
+    toolBox.style.height = "30px";
     toolBox.style.position = "absolute";
     toolBox.style.left = `${event.pageX}px`;
     toolBox.style.top = `${event.pageY}px`;
     toolBox.style.zIndex = 10;
+    toolBox.style.borderRadius = "3px";
+    toolBox.style.backgroundColor = "#ffffff";
     toolBox.setAttribute("id", "tool-box");
+
+    getMemoIcon.style.zIndex = 11;
+    getMemoIcon.innerHTML = getMemoSvg;
+    getMemoIcon.setAttribute("class", "get-memo-button");
+    getMemoIcon.addEventListener("click", (event) => {
+      chrome.storage.local.get("userInfo", (userInfo) => {
+        if (
+          userInfo.userInfo.idToken &&
+          Object.keys(userInfo.userInfo.idToken).length === 0
+        ) {
+          return window.alert("로그인 후 사용해주세요");
+        }
+        chrome.runtime.sendMessage(
+          { action: "getMemo", selectionText, userInfo },
+          (response) => {
+            if (response.success && response.memo !== null) {
+              const memo = response.memo;
+              const { title, description } = memo;
+
+              renderMemoEditor(event, title, description);
+              toolBox.parentNode.removeChild(toolBox);
+
+              return;
+            } else {
+              window.alert("해당 메모를 찾지 못했습니다.");
+              toolBox.parentNode.removeChild(toolBox);
+            }
+          }
+        );
+      });
+    });
 
     createMemoIcon.style.zIndex = 11;
     createMemoIcon.innerHTML = createMemoSvg;
     createMemoIcon.setAttribute("class", "create-memo-button");
-
     createMemoIcon.addEventListener("click", () => {
       chrome.storage.local.get("userInfo", (userInfo) => {
         if (
@@ -76,37 +110,7 @@ window.onload = () => {
       });
     });
 
-    getMemoIcon.style.zIndex = 11;
-    getMemoIcon.innerHTML = getMemoSvg;
-    getMemoIcon.setAttribute("class", "get-memo-button");
-
-    getMemoIcon.addEventListener("click", () => {
-      chrome.storage.local.get("userInfo", (userInfo) => {
-        if (
-          userInfo.userInfo.idToken &&
-          Object.keys(userInfo.userInfo.idToken).length === 0
-        ) {
-          return window.alert("로그인 후 사용해주세요");
-        }
-        chrome.runtime.sendMessage(
-          { action: "getMemo", selectionText, userInfo },
-          (response) => {
-            if (response.success && response.memo !== null) {
-              const memo = response.memo;
-              const { title, description } = memo;
-
-              renderMemoEditor(event, title, description);
-              toolBox.parentNode.removeChild(toolBox);
-
-              return;
-            } else {
-              window.alert("해당 메모를 찾지 못했습니다.");
-              toolBox.parentNode.removeChild(toolBox);
-            }
-          }
-        );
-      });
-    });
+    showHighLightIcon.style.zIndex = 11;
 
     toolBox.appendChild(getMemoIcon);
     toolBox.appendChild(createMemoIcon);
@@ -225,29 +229,56 @@ window.onload = () => {
   };
 
   const deleteMemo = (memoId) => {
-    const result = window.confirm("정말 삭제하시겠습니까?");
-    const memoEditorContainer = document.getElementById(memoId);
+    chrome.storage.local.get("userInfo", (userInfo) => {
+      if (
+        userInfo.userInfo.idToken &&
+        Object.keys(userInfo.userInfo.idToken).length === 0
+      ) {
+        return window.alert("로그인 후 사용해주세요");
+      }
+      const result = window.confirm("정말 삭제하시겠습니까?");
+      const memoEditorContainer = document.getElementById(memoId);
 
-    if (result) {
-      chrome.runtime.sendMessage(
-        { action: "deleteMemo", memoId },
-        (response) => {
-          if (response.success) {
-            memoEditorContainer.parentNode.removeChild(memoEditorContainer);
+      if (result) {
+        chrome.runtime.sendMessage(
+          { action: "deleteMemo", memoId, userInfo },
+          (response) => {
+            if (response.success) {
+              memoEditorContainer.parentNode.removeChild(memoEditorContainer);
 
-            return;
-          } else {
-            window.alert("메모가 삭제되지 않았습니다.");
-            memoEditorContainer.parentNode.removeChild(memoEditorContainer);
+              return;
+            } else {
+              window.alert("메모가 삭제되지 않았습니다.");
+              memoEditorContainer.parentNode.removeChild(memoEditorContainer);
+            }
           }
-        }
-      );
+        );
 
-      return;
-    }
+        return;
+      }
+    });
   };
 
   document.addEventListener("mouseup", (event) => {
+    // const arr = ["행동", "함께자면", "소형견"];
+    // const showHighLight = (text) => {
+    //   let innerHTML = document.querySelector("body").innerHTML;
+    //   const index = innerHTML.indexOf(text);
+    //   if (index >= 0) {
+    //     innerHTML =
+    //       innerHTML.substring(0, index) +
+    //       "<mark>" +
+    //       innerHTML.substring(index, index + text.length) +
+    //       "</mark>" +
+    //       innerHTML.substring(index + text.length);
+    //     document.querySelector("body").innerHTML = innerHTML;
+    //     return;
+    //   }
+    // };
+    // arr.map((word) => {
+    //   highlight(word);
+    // });
+
     const selection = window.getSelection();
     const selectionText = selection.toString().trim();
     const toolBox = document.getElementById("tool-box");
