@@ -82,12 +82,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     if (request.action === "deleteMemo") {
       try {
+        const { googleId, idToken } = request.userInfo.userInfo;
         const response = await fetch(
-          `http://localhost:8080/memos/${request.memoId}`,
+          `http://localhost:8080/users/${googleId}/memos/${request.memoId}`,
           {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json; charset=utf-8",
+              Authorization: `Bearer ${idToken}`,
             },
           }
         );
