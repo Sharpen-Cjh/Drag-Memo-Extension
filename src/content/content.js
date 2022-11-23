@@ -44,6 +44,7 @@ const MESSAGE_FAIL_CREATE_MEMO = "메모 생성이 실패하였습니다.";
 const MESSAGE_CONFIRM_DELETE = "메모를 정말 삭제하시겠습니까?";
 const MESSAGE_FAIL_DELETE_MEMO = "메모 삭제가 실패됐습니다.";
 const MESSAGE_FAIL_SAVE_MEMO = "메모 저장이 실패됐습니다.";
+const MESSAGE_FAIL_GET_MEMO_TITLES = "저장된 메모가 없습니다.";
 
 document.addEventListener("mouseup", (event) => {
   renderToolBox(event);
@@ -67,7 +68,6 @@ const makeToolBoxIcon = (event, selectionText) => {
   const getMemoIcon = document.createElement("div");
   const createMemoIcon = document.createElement("div");
   const showHighLightIcon = document.createElement("div");
-
   toolBox.style.display = "flex";
   toolBox.style.flexDirection = "row";
   toolBox.style.width = "95px";
@@ -178,11 +178,17 @@ const showSavedTitles = (toolBox) => {
     chrome.runtime.sendMessage(
       { action: "getMemoTitles", userInfo },
       (response) => {
-        response.map((title) => {
-          showHighLight(title);
-        });
+        if (response.length !== 0) {
+          response.forEach((title) => {
+            showHighLight(title);
+            toolBox?.parentNode?.removeChild(toolBox);
+          });
 
-        toolBox.parentNode.removeChild(toolBox);
+          return;
+        } else {
+          window.alert(MESSAGE_FAIL_GET_MEMO_TITLES);
+          toolBox.parentNode.removeChild(toolBox);
+        }
       }
     );
   });
