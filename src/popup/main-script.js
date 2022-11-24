@@ -11,7 +11,7 @@ onAuthStateChanged(auth, async (user) => {
       googleId: reloadUserInfo.localId,
       idToken,
     };
-    const { status } = await fetch("http://localhost:8080/login", {
+    const { status } = await fetch("https://api.hello-word.site/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
@@ -43,5 +43,5 @@ document.querySelector(".button-logout").addEventListener("click", async () => {
 });
 
 document.querySelector(".button-homePage").addEventListener("click", () => {
-  window.open("http://localhost:3000/");
+  window.open("https://www.hello-word.site");
 });
