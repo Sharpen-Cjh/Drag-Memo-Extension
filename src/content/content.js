@@ -68,6 +68,7 @@ const makeToolBoxIcon = (event, selectionText) => {
   const getMemoIcon = document.createElement("div");
   const createMemoIcon = document.createElement("div");
   const showHighLightIcon = document.createElement("div");
+
   toolBox.style.display = "flex";
   toolBox.style.flexDirection = "row";
   toolBox.style.width = "95px";
@@ -124,17 +125,18 @@ const getMemo = (event, selectionText, toolBox) => {
       { action: "getMemo", selectionText, userInfo },
       (response) => {
         if (response.success && response.memo !== null) {
-          const memo = response.memo;
-          const { title, description } = memo;
+          const {
+            memo: { title, description },
+          } = response;
 
           renderMemoEditor(event, title, description);
-          toolBox.parentNode.removeChild(toolBox);
+          toolBox?.parentNode.removeChild(toolBox);
 
           return;
         } else {
           window.alert(MESSAGE_FAIL_GET_MEMO);
 
-          toolBox.parentNode.removeChild(toolBox);
+          toolBox?.parentNode.removeChild(toolBox);
         }
       }
     );
@@ -155,6 +157,7 @@ const createMemo = (event, selectionText, toolBox) => {
       (response) => {
         if (response.success) {
           window.alert(MESSAGE_SUCCESS_CREATE_MEMO);
+
           renderMemoEditor(event, selectionText);
 
           toolBox.parentNode.removeChild(toolBox);
@@ -184,27 +187,48 @@ const showSavedTitles = (toolBox) => {
             toolBox?.parentNode?.removeChild(toolBox);
           });
 
+          response.forEach((title) => {
+            const highLightSpan = document.getElementById(`${title}-highlight`);
+            if (highLightSpan) {
+              highLightSpan.addEventListener("click", (event) => {
+                getMemo(event, title);
+              });
+
+              return;
+            }
+          });
+
           return;
         } else {
           window.alert(MESSAGE_FAIL_GET_MEMO_TITLES);
-          toolBox.parentNode.removeChild(toolBox);
+          toolBox?.parentNode.removeChild(toolBox);
         }
       }
     );
   });
 };
-const showHighLight = (text) => {
+const showHighLight = async (title) => {
   let innerHTML = document.querySelector("body").innerHTML;
-  const index = innerHTML.indexOf(text);
-
+  const index = innerHTML.indexOf(title);
   if (index >= 0) {
     innerHTML =
       innerHTML.substring(0, index) +
-      "<mark>" +
-      innerHTML.substring(index, index + text.length) +
-      "</mark>" +
-      innerHTML.substring(index + text.length);
+      `<span id="${title}-highlight">` +
+      innerHTML.substring(index, index + title.length) +
+      "</span>" +
+      innerHTML.substring(index + title.length);
     document.querySelector("body").innerHTML = innerHTML;
+
+    const highLightSpan = document.getElementById(`${title}-highlight`);
+
+    if (highLightSpan) {
+      highLightSpan.style.background = "#0d6efd";
+      highLightSpan.style.color = "#fff";
+      highLightSpan.style.display = "inline-block";
+      highLightSpan.style.zIndex = 11;
+
+      return;
+    }
 
     return;
   }
@@ -232,22 +256,12 @@ const renderMemoEditor = (event, title, description) => {
   memoEditorContainer.setAttribute("class", "memoEditor-container");
   memoEditorContainer.setAttribute("id", title);
 
-  memoEditorHeader.style.width = "294px";
+  memoEditorHeader.style.width = "300px";
   memoEditorHeader.style.height = "30px";
   memoEditorHeader.style.display = "flex";
   memoEditorHeader.style.flexDirection = "row";
   memoEditorHeader.style.justifyContent = "space-between";
-  memoEditorHeader.style.backgroundColor = "#f2f1f1";
   memoEditorHeader.setAttribute("class", "memoEditor-header");
-
-  memoTitle.style.width = "240px";
-  memoTitle.style.height = "30px";
-  memoTitle.style.color = "black";
-  memoTitle.style.fontSize = "small";
-  memoTitle.style.fontWeight = "20px;";
-  memoTitle.style.textAlign = "center";
-  memoTitle.style.justifyContent = "center";
-  memoTitle.textContent = title;
 
   memoDeleteButton.style.width = "30px";
   memoDeleteButton.style.height = "30px";
@@ -258,8 +272,9 @@ const renderMemoEditor = (event, title, description) => {
     deleteMemo(title);
   });
 
-  memoCloseButton.style.width = "30px";
-  memoCloseButton.style.height = "30px";
+  memoCloseButton.style.width = "25px";
+  memoCloseButton.style.height = "25px";
+  memoCloseButton.style.margin = "0px";
   memoCloseButton.innerHTML = closeSvg;
 
   memoCloseButton.addEventListener("click", () => {
@@ -267,17 +282,25 @@ const renderMemoEditor = (event, title, description) => {
   });
   memoCloseButton.setAttribute("class", "memo-close-button");
 
+  memoTitle.style.width = "240px";
+  memoTitle.style.height = "30px";
+  memoTitle.style.color = "black";
+  memoTitle.style.fontWeight = "20px";
+  memoTitle.style.fontSize = "20px";
+  memoTitle.textContent = title;
+
   memoEditor.style.width = "300px";
   memoEditor.style.height = "300px";
   memoEditor.style.overflow = "auto";
+  memoEditor.style.marginTop = "10px";
   memoEditor.contentEditable = "true";
   memoEditor.setAttribute("class", "memo-editor");
   memoEditor.innerText = description || "";
 
   memoEditorContainer.appendChild(memoEditorHeader);
+  memoEditorContainer.appendChild(memoTitle);
   memoEditorContainer.appendChild(memoEditor);
   memoEditorHeader.appendChild(memoDeleteButton);
-  memoEditorHeader.appendChild(memoTitle);
   memoEditorHeader.appendChild(memoCloseButton);
 
   document.body.appendChild(memoEditorContainer);

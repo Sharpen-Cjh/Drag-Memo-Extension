@@ -7,7 +7,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         };
         const { googleId, idToken } = request.userInfo.userInfo;
         const response = await fetch(
-          `http://localhost:8080/users/${googleId}/memo`,
+          `https://api.hello-word.site/users/${googleId}/memo`,
           {
             method: "POST",
             headers: {
@@ -31,8 +31,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "getMemo") {
       try {
         const { googleId, idToken } = request.userInfo.userInfo;
+        console.log(idToken);
         const response = await fetch(
-          `http://localhost:8080/users/${googleId}/memos/${request.selectionText}`,
+          `https://api.hello-word.site/users/${googleId}/memos/${request.selectionText}`,
           {
             headers: {
               "Content-Type": "application/json; charset=utf-8",
@@ -59,7 +60,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         };
         const { googleId, idToken } = request.userInfo.userInfo;
         const response = await fetch(
-          `http://localhost:8080/users/${googleId}/memos/${request.memoId}`,
+          `https://api.hello-word.site/users/${googleId}/memos/${request.memoId}`,
           {
             method: "PATCH",
             headers: {
@@ -84,7 +85,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       try {
         const { googleId, idToken } = request.userInfo.userInfo;
         const response = await fetch(
-          `http://localhost:8080/users/${googleId}/memos/${request.memoId}`,
+          `https://api.hello-word.site/users/${googleId}/memos/${request.memoId}`,
           {
             method: "DELETE",
             headers: {
@@ -108,7 +109,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       try {
         const { googleId, idToken } = request.userInfo.userInfo;
         const response = await fetch(
-          `http://localhost:8080/users/${googleId}/memos/titles`,
+          `https://api.hello-word.site/users/${googleId}/memos/titles`,
           {
             headers: {
               "Content-Type": "application/json; charset=utf-8",
