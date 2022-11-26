@@ -45,6 +45,7 @@ const MESSAGE_CONFIRM_DELETE = "메모를 정말 삭제하시겠습니까?";
 const MESSAGE_FAIL_DELETE_MEMO = "메모 삭제가 실패됐습니다.";
 const MESSAGE_FAIL_SAVE_MEMO = "메모 저장이 실패됐습니다.";
 const MESSAGE_FAIL_GET_MEMO_TITLES = "저장된 메모가 없습니다.";
+const MESSAGE_REFRESH_PLEASE = "새로고침 후 시도해주세요";
 
 document.addEventListener("mouseup", (event) => {
   renderToolBox(event);
@@ -106,7 +107,7 @@ const makeToolBoxIcon = (event, selectionText) => {
   showHighLightIcon.innerHTML = showHighLightSvg;
 
   showHighLightIcon.addEventListener("click", () => {
-    showSavedTitles(toolBox);
+    showSavedTitles(toolBox, event);
   });
 
   toolBox.appendChild(getMemoIcon);
@@ -172,18 +173,28 @@ const createMemo = (event, selectionText, toolBox) => {
     );
   });
 };
-const showSavedTitles = (toolBox) => {
+const showSavedTitles = (toolBox, event) => {
   chrome.storage.local.get("userInfo", (userInfo) => {
     if (Object.keys(userInfo).length === 0) {
       return window.alert(MESSAGE_LOGIN_PLEASE);
     }
-
     chrome.runtime.sendMessage(
       { action: "getMemoTitles", userInfo },
       (response) => {
         if (response.length !== 0) {
+          const highLightSpan =
+            document.getElementsByClassName("highLightSpan");
+
+          let newInnerHTML = event.target.innerHTML;
+          newInnerHTML =
+            "<span id='high'>" + newInnerHTML.substring(0) + "</span>";
+          event.target.innerHTML = newInnerHTML;
+
+          if (highLightSpan.length) {
+            return window.alert(MESSAGE_REFRESH_PLEASE);
+          }
           response.forEach((title) => {
-            showHighLight(title);
+            showHighLight(title, event);
             toolBox?.parentNode?.removeChild(toolBox);
           });
 
@@ -207,17 +218,18 @@ const showSavedTitles = (toolBox) => {
     );
   });
 };
-const showHighLight = async (title) => {
-  let innerHTML = document.querySelector("body").innerHTML;
-  const index = innerHTML.indexOf(title);
+const showHighLight = async (title, event) => {
+  let newInnerHTML = event.target.innerHTML;
+  const index = newInnerHTML.indexOf(title);
+
   if (index >= 0) {
-    innerHTML =
-      innerHTML.substring(0, index) +
-      `<span id="${title}-highlight">` +
-      innerHTML.substring(index, index + title.length) +
+    newInnerHTML =
+      newInnerHTML.substring(0, index) +
+      `<span id="${title}-highlight" class="highLightSpan">` +
+      newInnerHTML.substring(index, index + title.length) +
       "</span>" +
-      innerHTML.substring(index + title.length);
-    document.querySelector("body").innerHTML = innerHTML;
+      newInnerHTML.substring(index + title.length);
+    event.target.innerHTML = newInnerHTML;
 
     const highLightSpan = document.getElementById(`${title}-highlight`);
 
@@ -226,6 +238,7 @@ const showHighLight = async (title) => {
       highLightSpan.style.color = "#fff";
       highLightSpan.style.display = "inline-block";
       highLightSpan.style.zIndex = 11;
+      highLightSpan.style.cursor = "pointer";
 
       return;
     }

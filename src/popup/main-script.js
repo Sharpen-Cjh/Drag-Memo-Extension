@@ -19,7 +19,6 @@ onAuthStateChanged(auth, async (user) => {
       },
       body: JSON.stringify(userInfo),
     });
-
     status === 200
       ? chrome.storage.local.set({ userInfo })
       : window.location.replace("./popup.html");

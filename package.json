@@ -1,4 +1,9 @@
 {
+  "name": "hello-word-extension",
+  "author": {
+    "email": "jaehyeok92007@gmail.com",
+    "name": "최재혁"
+  },
   "scripts": {
     "build": "webpack --watch --config webpack.development.js",
     "release": "webpack --config webpack.production.js"
