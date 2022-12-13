@@ -4,6 +4,7 @@ const auth = getAuth(firebaseApp);
 
 onAuthStateChanged(auth, async (user) => {
   if (user != null) {
+    console.log(user);
     const { displayName, reloadUserInfo } = user;
     const idToken = await user.getIdToken();
     const userInfo = {
@@ -19,6 +20,7 @@ onAuthStateChanged(auth, async (user) => {
       },
       body: JSON.stringify(userInfo),
     });
+    console.log("status", status);
     status === 200
       ? chrome.storage.local.set({ userInfo })
       : window.location.replace("./popup.html");

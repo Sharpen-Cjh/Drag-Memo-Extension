@@ -9,6 +9,7 @@ module.exports = {
     firebase_config: "./src/popup/firebase_config.js",
     popup: "./src/popup/popup.js",
     main_script: "./src/popup/main-script.js",
+    content: "./src/content/content.js",
   },
   plugins: [
     new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
