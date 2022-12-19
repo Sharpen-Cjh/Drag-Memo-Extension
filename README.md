@@ -3,27 +3,112 @@
 ## hello-word는 자신만의 단어 저장소를 만들 수 있는 크롬 확장 프로그램입니다.
 
 ### [프로그램 시연영상](https://www.youtube.com/watch?v=jnf0p65iNn4)
+<details>
+<summary>
+기능 
+</summary>
 
-### 설치방법
+1. hello-word 크롬 익스텐션 설치 후 우측 상단 아이콘 클릭을 통해 로그인 가능<img width="1436" alt="스크린샷 2022-12-14 오전 8 57 07" src="https://user-images.githubusercontent.com/101804186/207471178-8ce2a5c7-1e47-4f43-805e-7a58258ea877.png">
 
-1. 크롬 웹스토어에서 다운.
-   [다운로드 링크](https://chrome.google.com/webstore/detail/hello-word/pegeamjammjhpgdddkbbpfodepbflnfn/related?hl=ko&authuser=0)
 
-### 제작 동기
+2. 일반 웹페이지 내에서 단어를 드래그 후 총 3가지 아이콘 등장  
+      <img width="424" alt="스크린샷 2022-12-14 오전 8 54 36" src="https://user-images.githubusercontent.com/101804186/207470706-d4c81235-baed-4f61-9de7-b38a312f8983.png">
 
-웹 페이지 내에서 이미 학습했지만 기억나지 않는 단어 등장시 해당 단어에 대하여 다시 구글링 하는 시간을 단축 시키기 위하여 제작.
-
-### 기능
-
-1. 일반 웹페이지 내에서 단어를 드래그 후 총 3가지 아이콘 등장
 
 - 돋보기 아이콘 클릭: 해당 단어에 대한 데이터 불러오기
 
 - 연필 아이콘 클릭: 해당 단어에 대한 데이터 생성 및 수정
 
-- 전구 아이콘 클릭: 클릭한 영역내에 저장된 단어 데이터가 존재한다면 해당 단어들 하이라이트 표시
+- 전구 아이콘 클릭: 페이지내에 저장된 단어 데이터가 존재한다면 해당 단어들 하이라이트 표시<img width="538" alt="스크린샷 2022-12-14 오전 9 02 38" src="https://user-images.githubusercontent.com/101804186/207471636-fc7a2410-6527-47ad-8017-265f7fa62f9e.png">
 
-2. [hello-word.site](https://www.hello-word.site/)로 접속하여 단어 별도 추가 및 수정 가능.
+
+3. [hello-word.site](https://www.hello-word.site/)로 접속하여 단어 별도 추가 및 수정 가능.
+</details>
+
+### 설치방법
+### Extension
+1. 크롬 웹스토어에서 다운.
+   [다운로드 링크](https://chrome.google.com/webstore/detail/hello-word/pegeamjammjhpgdddkbbpfodepbflnfn/related?hl=ko&authuser=0)
+<details>
+<summary>
+2. 직접 빌드하여 설치하기.  
+</summary>
+
+다운로드를 위해, 아래 명령어를 터미널에 입력해주세요.
+
+2.1 클론하여 빌드하기. 
+```git clone https://github.com/Sharpen-Cjh/hello-word-extension.git``` 
+```
+cd hello-word
+npm install
+npm run build
+```
+hello-word 디렉토리에 소스코드가 빌드된 dist 폴더가 생성됩니다.
+
+2.2 크롬 브라우저에서 확장프로그램 로드
+크롬 브라우저를 열고 chrome://extensions/에 접속합니다.
+<img width="1440" alt="스크린샷 2022-12-14 오전 8 15 04" src="https://user-images.githubusercontent.com/101804186/207465613-bbeba21e-1fb7-48d1-9641-3ddfb4bcd2c3.png">  
+2.3 우측 상단에 개발자 모드를 켭니다.  
+<img width="419" alt="스크린샷 2022-12-14 오전 8 16 47" src="https://user-images.githubusercontent.com/101804186/207465805-91d52384-f212-4a17-a5ab-aae9e800d791.png">.  
+2.4 좌측 상단에 압축 해제된 확장 프로그램을 로드합니다 버튼을 클릭합니다.   
+2.5 이전 과정에서 생성된 dist폴더를 선택하여 설치합니다.   
+```
+"oauth2": {
+    "client_id": "YOUR CLIENT ID",
+  },
+```
+2.6 본인의 구글 클라우드 플랫폼 프로젝트 아이디와 Oauth2키를 dist폴더 안에 있는 manifest.json 파일에 입력합니다.  
+```
+FIREBASE_API_KEY=
+FIREBASE_AUTH_DOMAIN=
+FIREBASE_PROJECT_ID=
+FIREBASE_STORAGE_BUCKET=
+FIREBASE_MESSAGING_SENDER_ID=
+FIREBASE_APP_ID=
+```
+2.7 디렉토리 root 위치에 .env 파일을 생성하여 환경설정을 입력합니다.  
+### FrontEnd
+1. 클론하여 빌드하기.  
+다운로드를 위해, 터미널에 아래명령어를 입력해주세요.    
+```git clone https://github.com/Sharpen-Cjh/web-memo-frontend.git```  
+```npm install```  
+2. 디렉토리 root 위치에 .env 파일을 생성하여 환경설정을 입력합니다.  
+```
+REACT_APP_BACK_URL=
+
+REACT_APP_API_KEY=
+REACT_APP_AUTH_DOMAIN=
+REACT_APP_PROJECT_ID=
+REACT_APP_STORAGE_BUCKET=
+REACT_APP_MESSAGING_SENDER_ID=
+REACT_APP_APP_ID=
+``` 
+```npm start```  
+### Backend(Express). 
+1. 클론하여 빌드하기.  
+다운로드를 위해, 터미널에 아래명령어를 입력해주세요.  
+```https://github.com/Sharpen-Cjh/web-memo-backend.git```  
+```npm install```  
+2. 디렉토리 root 위치에 .env 파일을 생성하여 환경설정을 입력합니다.
+```
+MONGO_DB=
+
+FIREBASE_SERVICE_TYPE=
+FIREBASE_SERVICE_PROJECT_ID=
+FIREBASE_SERVICE_PRIVATE_KEY_ID=
+FIREBASE_SERVICE_PRIVATE_KEY=
+FIREBASE_SERVICE_CLIENT_EMAIL=
+FIREBASE_SERVICE_CLIENT_ID=
+FIREBASE_SERVICE_AUTH_URI=
+FIREBASE_SERVICE_TOKEN_URI=
+FIREBASE_SERVICE_AUTH_PROVIDER_URL=
+FIREBASE_SERVICE_CLIENT_URL=
+```
+</details>
+
+### 제작 동기
+
+웹 페이지 내에서 이미 학습했지만 기억나지 않는 단어 등장시 해당 단어에 대하여 다시 구글링 하는 시간을 단축 시키기 위하여 제작.
 
 ### 기술 스택
 
