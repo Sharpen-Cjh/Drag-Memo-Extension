@@ -1,16 +1,23 @@
 import { MESSAGE } from "../constants/message";
-import { ToolBox } from "../components/ToolBox";
-import { MemoEditor } from "../components/MemoEditor";
+import { ToolBox } from "../observer/observer";
+import { MemoEditor } from "../observer/observer";
+import Subject from "../subject/subject";
+
+const subject = new Subject();
+const toolBox = new ToolBox();
+const memoEditor = new MemoEditor();
 
 let selectionState = {
   selectionText: window.getSelection().toString().trim(),
   event: "",
 };
-
 let memoState = {
   title: "",
   description: "",
 };
+
+subject.subscribe(toolBox);
+subject.subscribe(memoEditor);
 
 document.addEventListener("mouseup", (event) => {
   const selectionText = window.getSelection().toString().trim();
@@ -20,43 +27,41 @@ document.addEventListener("mouseup", (event) => {
 });
 
 const setSelectionState = (newState) => {
-  const toolBoxIcon = document.getElementById("tool-box");
+  const toolBoxIcon = document.querySelector(".tool-box");
 
   if (toolBoxIcon) {
     return;
   }
 
   selectionState = { ...selectionState, ...newState };
-  renderToolBox();
+
+  if (selectionState.selectionText) {
+    subject.notify(
+      toolBox,
+      selectionState,
+      getMemo,
+      createMemo,
+      showSavedTitles
+    );
+
+    return;
+  }
 };
 
 const setMemoState = (newState) => {
-  const memoEditorBox = document.getElementsByClassName("memo-editor-box");
+  const memoEditorBox = document.querySelector(".memo-editor-box");
 
-  if (memoEditorBox.length > 0) {
+  if (memoEditorBox) {
     return;
   }
 
   memoState = { ...memoState, ...newState };
-  renderMemoEditor();
-};
 
-const renderToolBox = () => {
-  const toolBoxIcon = document.getElementById("tool-box");
-
-  if (selectionState.selectionText && !toolBoxIcon) {
-    document.body.appendChild(
-      ToolBox(selectionState, getMemo, createMemo, showSavedTitles)
-    );
-
-    return;
-  } else if (toolBoxIcon !== selectionState.event.target?.parentNode) {
-    deleteToolBox();
-  }
+  subject.notify(memoEditor, selectionState, memoState, deleteMemo, closeMemo);
 };
 
 const deleteToolBox = (event) => {
-  let toolBoxIcon = document.getElementById("tool-box");
+  let toolBoxIcon = document.querySelector(".tool-box");
 
   if (toolBoxIcon === event?.target?.parentNode) {
     return;
@@ -64,12 +69,6 @@ const deleteToolBox = (event) => {
 
   toolBoxIcon?.parentNode?.removeChild(toolBoxIcon);
   toolBoxIcon = "";
-};
-
-const renderMemoEditor = () => {
-  document.body.appendChild(
-    MemoEditor(selectionState, memoState, deleteMemo, closeMemo)
-  );
 };
 
 const deleteMemoEditor = () => {
