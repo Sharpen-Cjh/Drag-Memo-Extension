@@ -15,6 +15,7 @@ export const ICON = {
     height="25px"
     viewBox="0 0 35 35"
     data-name="Layer 2"
+    pointer-events="none"
     id="e1c043b0-44b4-451c-80e1-98e21b9b3b3c"
     xmlns="http://www.w3.org/2000/svg"
   >
@@ -24,7 +25,7 @@ export const ICON = {
   </svg>
 `,
   closeMemo: `
-<svg width="25px" height="25px" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="25px" height="25px" viewBox="0 0 48 48" fill="none" pointer-events="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="48" height="48" fill="white" fill-opacity="0.01"/>
 <path d="M24 44C35.0457 44 44 35.0457 44 24C44 12.9543 35.0457 4 24 4C12.9543 4 4 12.9543 4 24C4 35.0457 12.9543 44 24 44Z" fill="#2F88FF" stroke="black" stroke-width="4" stroke-linejoin="round"/>
 <path d="M29.6569 18.3431L18.3432 29.6568" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>

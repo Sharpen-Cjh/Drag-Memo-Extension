@@ -7,38 +7,27 @@ const subject = new Subject();
 const toolBox = new ToolBox();
 const memoEditor = new MemoEditor();
 
-let selectionState = {
-  selectionText: window.getSelection().toString().trim(),
-  event: "",
-};
-let memoState = {
-  title: "",
-  description: "",
-};
-
 subject.subscribe(toolBox);
 subject.subscribe(memoEditor);
 
 document.addEventListener("mouseup", (event) => {
-  const selectionText = window.getSelection().toString().trim();
-
-  deleteToolBox(event);
-  setSelectionState({ selectionText, event });
-});
-
-const setSelectionState = (newState) => {
   const toolBoxIcon = document.querySelector(".tool-box");
 
   if (toolBoxIcon) {
+    deleteToolBox(event);
     return;
   }
 
-  selectionState = { ...selectionState, ...newState };
+  const selectionText = window.getSelection().toString().trim();
 
-  if (selectionState.selectionText) {
+  setSelectionState({ selectionText, event });
+});
+
+const setSelectionState = (newSelectionState) => {
+  if (newSelectionState.selectionText) {
     subject.notify(
       toolBox,
-      selectionState,
+      newSelectionState,
       getMemo,
       createMemo,
       showSavedTitles
@@ -48,16 +37,20 @@ const setSelectionState = (newState) => {
   }
 };
 
-const setMemoState = (newState) => {
+const setMemoState = (newMemoState, newSelectionState) => {
   const memoEditorBox = document.querySelector(".memo-editor-box");
 
   if (memoEditorBox) {
     return;
   }
 
-  memoState = { ...memoState, ...newState };
-
-  subject.notify(memoEditor, selectionState, memoState, deleteMemo, closeMemo);
+  subject.notify(
+    memoEditor,
+    newMemoState,
+    newSelectionState,
+    deleteMemo,
+    closeMemo
+  );
 };
 
 const deleteToolBox = (event) => {
@@ -78,40 +71,42 @@ const deleteMemoEditor = () => {
   memoEditorBox = "";
 };
 
-const getMemo = () => {
+const getMemo = (newSelectionState) => {
   chrome.storage.local.get("userInfo", (userInfo) => {
     if (Object.keys(userInfo).length === 0) {
-      return window.alert(MESSAGE.LOGIN_PLEASE);
+      window.alert(MESSAGE.LOGIN_PLEASE);
+      return;
     }
-    chrome.runtime.sendMessage(
-      {
-        action: "getMemo",
-        selectionText: selectionState.selectionText,
-        userInfo,
-      },
-      (response) => {
-        if (response.success && response.memo !== null) {
-          const {
-            memo: { title, description },
-          } = response;
-          setMemoState({ title, description });
-          deleteToolBox();
 
-          return;
-        } else {
+    if (userInfo) {
+      chrome.runtime.sendMessage(
+        {
+          action: "getMemo",
+          selectionText: newSelectionState.selectionText,
+          userInfo,
+        },
+        (response) => {
+          if (response.success && response.memo !== null) {
+            const newMemoState = response.memo;
+
+            setMemoState(newMemoState, newSelectionState);
+            deleteToolBox();
+
+            return;
+          }
           window.alert(MESSAGE.FAIL_GET_MEMO);
-
           deleteToolBox();
         }
-      }
-    );
+      );
+    }
   });
 };
 
-const getHighlightMemo = (title) => {
+const getHighlightMemo = (title, newSelectionState) => {
   chrome.storage.local.get("userInfo", (userInfo) => {
     if (Object.keys(userInfo).length === 0) {
-      return window.alert(MESSAGE.LOGIN_PLEASE);
+      window.alert(MESSAGE.LOGIN_PLEASE);
+      return;
     }
 
     chrome.runtime.sendMessage(
@@ -122,125 +117,69 @@ const getHighlightMemo = (title) => {
       },
       (response) => {
         if (response.success && response.memo !== null) {
-          const {
-            memo: { title, description },
-          } = response;
-          setMemoState({ title, description });
+          const newMemoState = response.memo;
+
+          setMemoState(newMemoState, newSelectionState);
 
           return;
-        } else {
-          window.alert(MESSAGE.FAIL_GET_MEMO);
         }
+        window.alert(MESSAGE.FAIL_GET_MEMO);
       }
     );
   });
 };
 
-const createMemo = () => {
+const createMemo = (newSelectionState) => {
   chrome.storage.local.get("userInfo", (userInfo) => {
     if (Object.keys(userInfo).length === 0) {
-      return window.alert(MESSAGE.LOGIN_PLEASE);
+      window.alert(MESSAGE.LOGIN_PLEASE);
+      return;
     }
 
     chrome.runtime.sendMessage(
       {
         action: "createMemo",
-        selectionText: selectionState.selectionText,
+        selectionText: newSelectionState.selectionText,
         userInfo,
       },
       (response) => {
         if (response.success) {
-          window.alert(MESSAGE.SUCCESS_CREATE_MEMO);
-          setMemoState({
-            title: selectionState.selectionText,
+          const newMemoState = {
+            title: newSelectionState.selectionText,
             description: "",
-          });
+          };
+
+          setMemoState(newMemoState, newSelectionState);
           deleteToolBox();
 
           return;
-        } else {
-          window.alert(MESSAGE.FAIL_CREATE_MEMO);
-
-          deleteToolBox();
         }
+        window.alert(MESSAGE.FAIL_CREATE_MEMO);
+        deleteToolBox();
       }
     );
   });
 };
 
-const showSavedTitles = () => {
+const showSavedTitles = (newSelectionState) => {
   chrome.storage.local.get("userInfo", (userInfo) => {
     if (Object.keys(userInfo).length === 0) {
-      return window.alert(MESSAGE.LOGIN_PLEASE);
+      window.alert(MESSAGE.LOGIN_PLEASE);
+      return;
     }
     chrome.runtime.sendMessage(
       { action: "getMemoTitles", userInfo },
       (response) => {
         if (response.length !== 0) {
           response.forEach((title) => {
-            highlight(title, selectionState.event);
+            highlight(title, newSelectionState.event);
           });
           deleteToolBox();
 
           return;
-        } else {
-          window.alert(MESSAGE.FAIL_GET_MEMO_TITLES);
-          deleteToolBox();
         }
-      }
-    );
-  });
-};
-
-const deleteMemo = () => {
-  chrome.storage.local.get("userInfo", (userInfo) => {
-    if (Object.keys(userInfo).length === 0) {
-      return window.alert(MESSAGE.LOGIN_PLEASE);
-    }
-
-    const result = window.confirm(MESSAGE.CONFIRM_DELETE);
-
-    if (result) {
-      chrome.runtime.sendMessage(
-        { action: "deleteMemo", memoId: memoState.title, userInfo },
-        (response) => {
-          if (response.success) {
-            deleteMemoEditor();
-
-            return;
-          } else {
-            window.alert(MESSAGE.FAIL_DELETE_MEMO);
-            deleteMemoEditor();
-          }
-        }
-      );
-
-      return;
-    }
-  });
-};
-
-const closeMemo = () => {
-  chrome.storage.local.get("userInfo", (userInfo) => {
-    if (Object.keys(userInfo).length === 0) {
-      return window.alert(MESSAGE.LOGIN_PLEASE);
-    }
-    chrome.runtime.sendMessage(
-      {
-        action: "patchMemo",
-        memoId: memoState.title,
-        innerText: memoState.description,
-        userInfo,
-      },
-      (response) => {
-        if (response.success) {
-          deleteMemoEditor();
-
-          return;
-        } else {
-          window.alert(MESSAGE.FAIL_SAVE_MEMO);
-          deleteMemoEditor();
-        }
+        window.alert(MESSAGE.FAIL_GET_MEMO_TITLES);
+        deleteToolBox();
       }
     );
   });
@@ -268,6 +207,7 @@ const highlight = (title, event) => {
         range = new Range();
         range.setStart(result.value, match.index - currentIndex);
       }
+
       if (
         match.index + title.length >= currentIndex &&
         match.index + title.length < currentIndex + result.value.length
@@ -313,11 +253,66 @@ const addHighLightDiv = (rects, title) => {
     highlightRect.style.background = "#0d6efd";
     highlightRect.style.opacity = 0.5;
     highlightRect.style.position = "absolute";
-    highlightRect.style.zIndex = 1;
+    highlightRect.style.zIndex = 6;
     highlightRect.style.cursor = "pointer";
 
-    highlightRect.addEventListener("click", () => {
-      getHighlightMemo(title);
+    highlightRect.addEventListener("click", (event) => {
+      const newSelectionState = { event };
+
+      getHighlightMemo(title, newSelectionState);
     });
   }
+};
+
+const deleteMemo = (memoState) => {
+  chrome.storage.local.get("userInfo", (userInfo) => {
+    if (Object.keys(userInfo).length === 0) {
+      window.alert(MESSAGE.LOGIN_PLEASE);
+      return;
+    }
+
+    const result = window.confirm(MESSAGE.CONFIRM_DELETE);
+
+    if (result) {
+      chrome.runtime.sendMessage(
+        { action: "deleteMemo", memoId: memoState.title, userInfo },
+        (response) => {
+          if (response.success) {
+            deleteMemoEditor();
+            return;
+          }
+          window.alert(MESSAGE.FAIL_DELETE_MEMO);
+          deleteMemoEditor();
+        }
+      );
+
+      return;
+    }
+  });
+};
+
+const closeMemo = (memoState) => {
+  chrome.storage.local.get("userInfo", (userInfo) => {
+    if (Object.keys(userInfo).length === 0) {
+      window.alert(MESSAGE.LOGIN_PLEASE);
+      return;
+    }
+
+    chrome.runtime.sendMessage(
+      {
+        action: "patchMemo",
+        memoId: memoState.title,
+        innerText: memoState.description,
+        userInfo,
+      },
+      (response) => {
+        if (response.success) {
+          deleteMemoEditor();
+          return;
+        }
+        window.alert(MESSAGE.FAIL_SAVE_MEMO);
+        deleteMemoEditor();
+      }
+    );
+  });
 };
