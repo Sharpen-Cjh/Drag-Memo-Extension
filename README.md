@@ -1,40 +1,64 @@
-# hello-word
+# Drag-Memo
 
-## hello-word는 자신만의 단어 저장소를 만들 수 있는 크롬 확장 프로그램입니다.
+## Drag-Memo는 자신만의 단어 저장소를 만들 수 있는 크롬 확장 프로그램입니다.
 
 ### 제작동기: 웹에서 학습을 하는 경우 한 번 본 경험으로는 잘 생각 나지 않을 정도로 어려운 개념을 가지고 있는 단어가 등장하는 경우가 많습니다. 그리고 그 단어가 등장할 때마다 다시 알아보기 위해 재차 구글링을 합니다.
 
-### hello-word는 앞서 말했던 상황이 발생했을 때 학습하는 사람의 시간을 낭비하지 않기 위해서 그리고 아무리 어려운 단어일지라도 해당 단어에 대해서 반복 노출되는 상황을 만들어 암기를 돕기 위해서 제작하였습니다.
+### Drag-Memo는 앞서 말했던 상황이 발생했을 때 학습하는 사람의 시간을 낭비하지 않기 위해서 그리고 아무리 어려운 단어일지라도 해당 단어에 대해서 반복 노출되는 상황을 만들어 암기를 돕기 위해서 제작하였습니다.
 
 <br/>
 
-### [프로그램 시연영상](https://www.youtube.com/watch?v=qlRR_pKAJOw)
+# 기능
+
+### [프로그램 설명 영상 보기](https://youtu.be/8-cDPv0-Brs)
 
 <br/>
+<details>
+<summary>Drag-Memo 크롬 익스텐션 설치 후 우측 상단 아이콘 클릭을 통해 로그인 가능</summary>
+
+![login](https://user-images.githubusercontent.com/101804186/212551178-d4ddf0e7-ab80-4c34-8aa4-d2eee929fe44.gif)
+
+</details>
+<details>
+<summary>일반 웹페이지 내에서 단어를 드래그 후 총 3가지 아이콘 등장</summary>
+
+![threeTools](https://user-images.githubusercontent.com/101804186/212542074-0200b68f-95bc-4660-85fa-5d78229e0456.gif)
+
+</details>
 
 <details>
-<summary>
-프로그램 기능(열어서 보기).
-</summary>
+<summary>연필 아이콘 클릭: 해당 단어에 대한 데이터 생성 및 수정</summary>
 
-1. hello-word 크롬 익스텐션 설치 후 우측 상단 아이콘 클릭을 통해 로그인 가능<img width="1436" alt="스크린샷 2022-12-14 오전 8 57 07" src="https://user-images.githubusercontent.com/101804186/207471178-8ce2a5c7-1e47-4f43-805e-7a58258ea877.png">
+![create](https://user-images.githubusercontent.com/101804186/212536503-ba6d3d19-9052-41fa-a0e1-5eede290a4e4.gif)
 
-2) 일반 웹페이지 내에서 단어를 드래그 후 총 3가지 아이콘 등장  
-    <img width="424" alt="스크린샷 2022-12-14 오전 8 54 36" src="https://user-images.githubusercontent.com/101804186/207470706-d4c81235-baed-4f61-9de7-b38a312f8983.png">
-
-- 돋보기 아이콘 클릭: 해당 단어에 대한 데이터 불러오기
-
-- 연필 아이콘 클릭: 해당 단어에 대한 데이터 생성 및 수정
-
-- 전구 아이콘 클릭: 페이지내에 저장된 단어 데이터가 존재한다면 해당 단어들 하이라이트 표시<img width="538" alt="스크린샷 2022-12-14 오전 9 02 38" src="https://user-images.githubusercontent.com/101804186/207471636-fc7a2410-6527-47ad-8017-265f7fa62f9e.png">
-
-3. [hello-word.site](https://www.hello-word.site/)로 접속하여 단어 별도 추가 및 수정 가능.
 </details>
+
+<details>
+<summary>돋보기 아이콘 클릭: 해당 단어에 대한 데이터 불러오기</summary>
+
+![get](https://user-images.githubusercontent.com/101804186/212541401-8865afac-ee18-450e-9dbd-31c111b05723.gif)
+
+</details>
+<details>
+<summary>전구 아이콘 클릭: 페이지내에 저장된 단어 데이터가 존재한다면 해당 단어들 하이라이트 표시</summary>
+
+![highlight](https://user-images.githubusercontent.com/101804186/212544137-82cfed88-c53a-4e44-b98f-2beb26dfb33a.gif)
+
+</details>
+
+<details>
+
+<summary> https://www.hello-word.site 접속하여 단어 별도 추가 및 수정 가능 </summary>
+
+![page](https://user-images.githubusercontent.com/101804186/212543683-c99390c1-be70-4331-bd19-2065cc6f7976.gif)
+
+</details>
+
 <br/>
 
 # 설치방법
 
-### [크롬 웹스토어에서 다운](https://chrome.google.com/webstore/detail/hello-word/pegeamjammjhpgdddkbbpfodepbflnfn/related?hl=ko&authuser=0)
+### [크롬 웹스토어에서 다운받아 바로 체험해보기](https://chrome.google.com/webstore/detail/hello-word/pegeamjammjhpgdddkbbpfodepbflnfn/related?hl=ko&authuser=0)
 
 <br/>
 
@@ -128,6 +152,12 @@ FIREBASE_SERVICE_CLIENT_URL=
 ```
 
 </details>
+
+## 레포지토리 링크
+
+### [Front-end](https://github.com/CJH-hello-word/hello-word-frontend)
+
+### [Back-end](https://github.com/CJH-hello-word/hello-word-backend)
 
 <br/>
 
