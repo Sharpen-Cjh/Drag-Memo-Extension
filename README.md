@@ -74,7 +74,7 @@ Drag-Memo는 앞서 말했던 상황이 발생했을 때 학습하는 사람의 
 
 ## 설치 방법
 
-### [크롬 웹스토어에서 다운받아 바로 체험해보기](https://chrome.google.com/webstore/detail/hello-word/pegeamjammjhpgdddkbbpfodepbflnfn/related?hl=ko&authuser=0)
+### [크롬 웹스토어에서 다운받아 바로 체험해보기](https://chrome.google.com/webstore/detail/drag-memo/ngkigmahhmigibddomcgdeifcdgfapdh?hl=ko&authuser=0)
 
 <details>
 <summary>
