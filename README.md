@@ -1,4 +1,11 @@
+<div align="center">
+
 # Drag-Memo
+    
+![dragMemo-short](https://user-images.githubusercontent.com/101804186/215661768-125e4112-3192-4e37-8a59-301872b1d19f.gif)
+
+</div>
+
 ## 목차
 [1. 프로젝트 소개](#프로젝트-소개)
 
