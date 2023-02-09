@@ -7,15 +7,21 @@ const subject = new Subject();
 const toolBox = new ToolBox();
 const memoEditor = new MemoEditor();
 
+const getUserInfo = async () => {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get("userInfo", (userInfo) => {
+      userInfo ? resolve(userInfo) : reject();
+    });
+  });
+};
+
 subject.subscribe(toolBox);
 subject.subscribe(memoEditor);
 
 document.addEventListener("mouseup", (event) => {
   const toolBoxIcon = document.querySelector(".tool-box");
-
   if (toolBoxIcon) {
-    deleteToolBox(event);
-    return;
+    return deleteToolBox(event);
   }
 
   const selectionText = window.getSelection().toString().trim();
@@ -71,48 +77,14 @@ const deleteMemoEditor = () => {
   memoEditorBox = "";
 };
 
-const getMemo = (newSelectionState) => {
-  chrome.storage.local.get("userInfo", (userInfo) => {
-    if (Object.keys(userInfo).length === 0) {
-      window.alert(MESSAGE.LOGIN_PLEASE);
-      return;
-    }
+const getMemo = async (newSelectionState) => {
+  const userInfo = await getUserInfo();
 
-    if (userInfo) {
-      chrome.runtime.sendMessage(
-        {
-          action: "getMemo",
-          selectionText: newSelectionState.selectionText,
-          userInfo,
-        },
-        (response) => {
-          if (response.success && response.memo !== null) {
-            const newMemoState = response.memo;
-
-            setMemoState(newMemoState, newSelectionState);
-            deleteToolBox();
-
-            return;
-          }
-          window.alert(MESSAGE.FAIL_GET_MEMO);
-          deleteToolBox();
-        }
-      );
-    }
-  });
-};
-
-const getHighlightMemo = (title, newSelectionState) => {
-  chrome.storage.local.get("userInfo", (userInfo) => {
-    if (Object.keys(userInfo).length === 0) {
-      window.alert(MESSAGE.LOGIN_PLEASE);
-      return;
-    }
-
+  if (userInfo) {
     chrome.runtime.sendMessage(
       {
         action: "getMemo",
-        selectionText: title,
+        selectionText: newSelectionState.selectionText,
         userInfo,
       },
       (response) => {
@@ -120,69 +92,84 @@ const getHighlightMemo = (title, newSelectionState) => {
           const newMemoState = response.memo;
 
           setMemoState(newMemoState, newSelectionState);
+          deleteToolBox();
 
           return;
         }
         window.alert(MESSAGE.FAIL_GET_MEMO);
-      }
-    );
-  });
-};
-
-const createMemo = (newSelectionState) => {
-  chrome.storage.local.get("userInfo", (userInfo) => {
-    if (Object.keys(userInfo).length === 0) {
-      window.alert(MESSAGE.LOGIN_PLEASE);
-      return;
-    }
-
-    chrome.runtime.sendMessage(
-      {
-        action: "createMemo",
-        selectionText: newSelectionState.selectionText,
-        userInfo,
-      },
-      (response) => {
-        if (response.success) {
-          const newMemoState = {
-            title: newSelectionState.selectionText,
-            description: "",
-          };
-
-          setMemoState(newMemoState, newSelectionState);
-          deleteToolBox();
-
-          return;
-        }
-        window.alert(MESSAGE.FAIL_CREATE_MEMO);
         deleteToolBox();
       }
     );
-  });
+  }
 };
 
-const showSavedTitles = (newSelectionState) => {
-  chrome.storage.local.get("userInfo", (userInfo) => {
-    if (Object.keys(userInfo).length === 0) {
-      window.alert(MESSAGE.LOGIN_PLEASE);
-      return;
-    }
-    chrome.runtime.sendMessage(
-      { action: "getMemoTitles", userInfo },
-      (response) => {
-        if (response.length !== 0) {
-          response.forEach((title) => {
-            highlight(title, newSelectionState.event);
-          });
-          deleteToolBox();
+const getHighlightMemo = async (title, newSelectionState) => {
+  const userInfo = await getUserInfo();
 
-          return;
-        }
-        window.alert(MESSAGE.FAIL_GET_MEMO_TITLES);
-        deleteToolBox();
+  chrome.runtime.sendMessage(
+    {
+      action: "getMemo",
+      selectionText: title,
+      userInfo,
+    },
+    (response) => {
+      if (response.success && response.memo !== null) {
+        const newMemoState = response.memo;
+
+        setMemoState(newMemoState, newSelectionState);
+
+        return;
       }
-    );
-  });
+      window.alert(MESSAGE.FAIL_GET_MEMO);
+    }
+  );
+};
+
+const createMemo = async (newSelectionState) => {
+  const userInfo = await getUserInfo();
+
+  chrome.runtime.sendMessage(
+    {
+      action: "createMemo",
+      selectionText: newSelectionState.selectionText,
+      userInfo,
+    },
+    (response) => {
+      if (response.success) {
+        const newMemoState = {
+          title: newSelectionState.selectionText,
+          description: "",
+        };
+
+        setMemoState(newMemoState, newSelectionState);
+        deleteToolBox();
+
+        return;
+      }
+      window.alert(MESSAGE.FAIL_CREATE_MEMO);
+      deleteToolBox();
+    }
+  );
+};
+
+const showSavedTitles = async (newSelectionState) => {
+  const userInfo = await getUserInfo();
+
+  chrome.runtime.sendMessage(
+    { action: "getMemoTitles", userInfo },
+    (response) => {
+      if (response.length !== 0) {
+        response.forEach((title) => {
+          highlight(title, newSelectionState.event);
+        });
+        deleteToolBox();
+
+        return;
+      }
+      window.alert(MESSAGE.FAIL_GET_MEMO_TITLES);
+      deleteToolBox();
+    }
+  );
 };
 
 const highlight = (title, event) => {
@@ -264,55 +251,45 @@ const addHighLightDiv = (rects, title) => {
   }
 };
 
-const deleteMemo = (memoState) => {
-  chrome.storage.local.get("userInfo", (userInfo) => {
-    if (Object.keys(userInfo).length === 0) {
-      window.alert(MESSAGE.LOGIN_PLEASE);
-      return;
-    }
+const deleteMemo = async (memoState) => {
+  const userInfo = await getUserInfo();
 
-    const result = window.confirm(MESSAGE.CONFIRM_DELETE);
+  const result = window.confirm(MESSAGE.CONFIRM_DELETE);
 
-    if (result) {
-      chrome.runtime.sendMessage(
-        { action: "deleteMemo", memoId: memoState.title, userInfo },
-        (response) => {
-          if (response.success) {
-            deleteMemoEditor();
-            return;
-          }
-          window.alert(MESSAGE.FAIL_DELETE_MEMO);
-          deleteMemoEditor();
-        }
-      );
-
-      return;
-    }
-  });
-};
-
-const closeMemo = (memoState) => {
-  chrome.storage.local.get("userInfo", (userInfo) => {
-    if (Object.keys(userInfo).length === 0) {
-      window.alert(MESSAGE.LOGIN_PLEASE);
-      return;
-    }
-
+  if (result) {
     chrome.runtime.sendMessage(
-      {
-        action: "patchMemo",
-        memoId: memoState.title,
-        innerText: memoState.description,
-        userInfo,
-      },
+      { action: "deleteMemo", memoId: memoState.title, userInfo },
       (response) => {
         if (response.success) {
           deleteMemoEditor();
           return;
         }
-        window.alert(MESSAGE.FAIL_SAVE_MEMO);
+        window.alert(MESSAGE.FAIL_DELETE_MEMO);
         deleteMemoEditor();
       }
     );
-  });
+
+    return;
+  }
+};
+
+const closeMemo = async (memoState) => {
+  const userInfo = await getUserInfo();
+
+  chrome.runtime.sendMessage(
+    {
+      action: "patchMemo",
+      memoId: memoState.title,
+      innerText: memoState.description,
+      userInfo,
+    },
+    (response) => {
+      if (response.success) {
+        deleteMemoEditor();
+        return;
+      }
+      window.alert(MESSAGE.FAIL_SAVE_MEMO);
+      deleteMemoEditor();
+    }
+  );
 };
