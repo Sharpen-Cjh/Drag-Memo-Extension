@@ -1,25 +1,22 @@
 import { MESSAGE } from "../constants/message";
+
 import { ToolBox } from "../observer/observer";
 import { MemoEditor } from "../observer/observer";
 import Subject from "../subject/subject";
 
+import { getUserInfo } from "../util/userinfo";
+import { sendMessageReceiveResponse } from "../util/sendmessage";
+
 const subject = new Subject();
 const toolBox = new ToolBox();
 const memoEditor = new MemoEditor();
-
-const getUserInfo = async () => {
-  return new Promise((resolve, reject) => {
-    chrome.storage.local.get("userInfo", (userInfo) => {
-      userInfo ? resolve(userInfo) : reject();
-    });
-  });
-};
 
 subject.subscribe(toolBox);
 subject.subscribe(memoEditor);
 
 document.addEventListener("mouseup", (event) => {
   const toolBoxIcon = document.querySelector(".tool-box");
+
   if (toolBoxIcon) {
     return deleteToolBox(event);
   }
@@ -81,95 +78,104 @@ const getMemo = async (newSelectionState) => {
   const userInfo = await getUserInfo();
 
   if (userInfo) {
-    chrome.runtime.sendMessage(
-      {
-        action: "getMemo",
-        selectionText: newSelectionState.selectionText,
-        userInfo,
-      },
-      (response) => {
-        if (response.success && response.memo !== null) {
-          const newMemoState = response.memo;
+    const message = {
+      action: "getMemo",
+      selectionText: newSelectionState.selectionText,
+      userInfo,
+    };
 
-          setMemoState(newMemoState, newSelectionState);
-          deleteToolBox();
+    const response = await sendMessageReceiveResponse(message);
 
-          return;
-        }
-        window.alert(MESSAGE.FAIL_GET_MEMO);
-        deleteToolBox();
-      }
-    );
+    if (response.success && response.memo !== null) {
+      const newMemoState = response.memo;
+
+      setMemoState(newMemoState, newSelectionState);
+      deleteToolBox();
+
+      return;
+    }
+
+    window.alert(MESSAGE.FAIL_GET_MEMO);
+    deleteToolBox();
   }
 };
 
 const getHighlightMemo = async (title, newSelectionState) => {
   const userInfo = await getUserInfo();
 
-  chrome.runtime.sendMessage(
-    {
+  if (userInfo) {
+    const message = {
       action: "getMemo",
       selectionText: title,
       userInfo,
-    },
-    (response) => {
-      if (response.success && response.memo !== null) {
-        const newMemoState = response.memo;
+    };
 
-        setMemoState(newMemoState, newSelectionState);
+    const response = await sendMessageReceiveResponse(message);
 
-        return;
-      }
-      window.alert(MESSAGE.FAIL_GET_MEMO);
+    if (response.success && response.memo !== null) {
+      const newMemoState = response.memo;
+
+      setMemoState(newMemoState, newSelectionState);
+
+      return;
     }
-  );
+
+    window.alert(MESSAGE.FAIL_GET_MEMO);
+  }
 };
 
 const createMemo = async (newSelectionState) => {
   const userInfo = await getUserInfo();
 
-  chrome.runtime.sendMessage(
-    {
+  if (userInfo) {
+    const message = {
       action: "createMemo",
       selectionText: newSelectionState.selectionText,
       userInfo,
-    },
-    (response) => {
-      if (response.success) {
-        const newMemoState = {
-          title: newSelectionState.selectionText,
-          description: "",
-        };
+    };
 
-        setMemoState(newMemoState, newSelectionState);
-        deleteToolBox();
+    const response = await sendMessageReceiveResponse(message);
 
-        return;
-      }
-      window.alert(MESSAGE.FAIL_CREATE_MEMO);
+    if (response.success) {
+      const newMemoState = {
+        title: newSelectionState.selectionText,
+        description: "",
+      };
+
+      setMemoState(newMemoState, newSelectionState);
       deleteToolBox();
+
+      return;
     }
-  );
+    window.alert(MESSAGE.FAIL_CREATE_MEMO);
+    deleteToolBox();
+  }
 };
 
 const showSavedTitles = async (newSelectionState) => {
   const userInfo = await getUserInfo();
 
-  chrome.runtime.sendMessage(
-    { action: "getMemoTitles", userInfo },
-    (response) => {
-      if (response.length !== 0) {
-        response.forEach((title) => {
-          highlight(title, newSelectionState.event);
-        });
-        deleteToolBox();
+  if (userInfo) {
+    const message = {
+      action: "getMemoTitles",
+      userInfo,
+    };
 
-        return;
-      }
-      window.alert(MESSAGE.FAIL_GET_MEMO_TITLES);
+    const response = await sendMessageReceiveResponse(message);
+
+    if (response.length !== 0) {
+      response.forEach((title) => {
+        highlight(title, newSelectionState.event);
+      });
+
       deleteToolBox();
+
+      return;
     }
-  );
+
+    window.alert(MESSAGE.FAIL_GET_MEMO_TITLES);
+    deleteToolBox();
+  }
 };
 
 const highlight = (title, event) => {
@@ -253,43 +259,45 @@ const addHighLightDiv = (rects, title) => {
 
 const deleteMemo = async (memoState) => {
   const userInfo = await getUserInfo();
-
   const result = window.confirm(MESSAGE.CONFIRM_DELETE);
 
-  if (result) {
-    chrome.runtime.sendMessage(
-      { action: "deleteMemo", memoId: memoState.title, userInfo },
-      (response) => {
-        if (response.success) {
-          deleteMemoEditor();
-          return;
-        }
-        window.alert(MESSAGE.FAIL_DELETE_MEMO);
-        deleteMemoEditor();
-      }
-    );
+  if (result && userInfo) {
+    const message = {
+      action: "deleteMemo",
+      memoId: memoState.title,
+      userInfo,
+    };
+    const response = await sendMessageReceiveResponse(message);
 
-    return;
+    if (response.success) {
+      deleteMemoEditor();
+      return;
+    }
+
+    window.alert(MESSAGE.FAIL_DELETE_MEMO);
+    deleteMemoEditor();
   }
 };
 
 const closeMemo = async (memoState) => {
   const userInfo = await getUserInfo();
 
-  chrome.runtime.sendMessage(
-    {
+  if (userInfo) {
+    const message = {
       action: "patchMemo",
       memoId: memoState.title,
       innerText: memoState.description,
       userInfo,
-    },
-    (response) => {
-      if (response.success) {
-        deleteMemoEditor();
-        return;
-      }
-      window.alert(MESSAGE.FAIL_SAVE_MEMO);
+    };
+
+    const response = await sendMessageReceiveResponse(message);
+
+    if (response.success) {
       deleteMemoEditor();
+      return;
     }
-  );
+
+    window.alert(MESSAGE.FAIL_SAVE_MEMO);
+    deleteMemoEditor();
+  }
 };
