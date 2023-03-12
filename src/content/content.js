@@ -1,11 +1,11 @@
-import { MESSAGE } from "../constants/message";
+import { MESSAGE } from '../constants/message';
 
-import { ToolBox } from "../observer/observer";
-import { MemoEditor } from "../observer/observer";
-import Subject from "../subject/subject";
+import { ToolBox } from '../observer/observer';
+import { MemoEditor } from '../observer/observer';
+import Subject from '../subject/subject';
 
-import { getUserInfo } from "../util/userinfo";
-import { sendMessageReceiveResponse } from "../util/sendmessage";
+import { getUserInfo } from '../util/userinfo';
+import { sendMessageReceiveResponse } from '../util/sendmessage';
 
 const subject = new Subject();
 const toolBox = new ToolBox();
@@ -14,8 +14,8 @@ const memoEditor = new MemoEditor();
 subject.subscribe(toolBox);
 subject.subscribe(memoEditor);
 
-document.addEventListener("mouseup", (event) => {
-  const toolBoxIcon = document.querySelector(".tool-box");
+document.addEventListener('mouseup', (event) => {
+  const toolBoxIcon = document.querySelector('.tool-box');
 
   if (toolBoxIcon) {
     return deleteToolBox(event);
@@ -33,7 +33,7 @@ const setSelectionState = (newSelectionState) => {
       newSelectionState,
       getMemo,
       createMemo,
-      showSavedTitles
+      showSavedMemos
     );
 
     return;
@@ -41,7 +41,7 @@ const setSelectionState = (newSelectionState) => {
 };
 
 const setMemoState = (newMemoState, newSelectionState) => {
-  const memoEditorBox = document.querySelector(".memo-editor-box");
+  const memoEditorBox = document.querySelector('.memo-editor-box');
 
   if (memoEditorBox) {
     return;
@@ -57,21 +57,21 @@ const setMemoState = (newMemoState, newSelectionState) => {
 };
 
 const deleteToolBox = (event) => {
-  let toolBoxIcon = document.querySelector(".tool-box");
+  let toolBoxIcon = document.querySelector('.tool-box');
 
   if (toolBoxIcon === event?.target?.parentNode) {
     return;
   }
 
   toolBoxIcon?.parentNode?.removeChild(toolBoxIcon);
-  toolBoxIcon = "";
+  toolBoxIcon = '';
 };
 
 const deleteMemoEditor = () => {
-  let memoEditorBox = document.getElementsByClassName("memo-editor-box");
+  let memoEditorBox = document.getElementsByClassName('memo-editor-box');
 
   memoEditorBox[0].parentNode.removeChild(memoEditorBox[0]);
-  memoEditorBox = "";
+  memoEditorBox = '';
 };
 
 const getMemo = async (newSelectionState) => {
@@ -79,7 +79,7 @@ const getMemo = async (newSelectionState) => {
 
   if (userInfo) {
     const message = {
-      action: "getMemo",
+      action: 'getMemo',
       selectionText: newSelectionState.selectionText,
       userInfo,
     };
@@ -105,7 +105,7 @@ const getHighlightMemo = async (title, newSelectionState) => {
 
   if (userInfo) {
     const message = {
-      action: "getMemo",
+      action: 'getMemo',
       selectionText: title,
       userInfo,
     };
@@ -129,7 +129,7 @@ const createMemo = async (newSelectionState) => {
 
   if (userInfo) {
     const message = {
-      action: "createMemo",
+      action: 'createMemo',
       selectionText: newSelectionState.selectionText,
       userInfo,
     };
@@ -139,7 +139,7 @@ const createMemo = async (newSelectionState) => {
     if (response.success) {
       const newMemoState = {
         title: newSelectionState.selectionText,
-        description: "",
+        description: '',
       };
 
       setMemoState(newMemoState, newSelectionState);
@@ -152,12 +152,12 @@ const createMemo = async (newSelectionState) => {
   }
 };
 
-const showSavedTitles = async (newSelectionState) => {
+const showSavedMemos = async (newSelectionState) => {
   const userInfo = await getUserInfo();
 
   if (userInfo) {
     const message = {
-      action: "getMemoTitles",
+      action: 'getMemoTitles',
       userInfo,
     };
 
@@ -179,7 +179,7 @@ const showSavedTitles = async (newSelectionState) => {
 };
 
 const highlight = (title, event) => {
-  const regex = RegExp(title, "g");
+  const regex = RegExp(title, 'g');
   let selection;
   let range;
   let match;
@@ -234,22 +234,22 @@ function* iterateNode(topNode) {
 const addHighLightDiv = (rects, title) => {
   for (let i = 0; i < rects.length; i++) {
     const rect = rects[i];
-    const highlightRect = document.createElement("div");
+    const highlightRect = document.createElement('div');
 
     document.body.appendChild(highlightRect);
 
-    highlightRect.classList.add("highlight");
-    highlightRect.style.top = rect.y + window.scrollY + "px";
-    highlightRect.style.left = rect.x + "px";
-    highlightRect.style.height = rect.height + "px";
-    highlightRect.style.width = rect.width + "px";
-    highlightRect.style.background = "#0d6efd";
+    highlightRect.classList.add('highlight-rect');
+    highlightRect.style.top = rect.y + window.scrollY + 'px';
+    highlightRect.style.left = rect.x + 'px';
+    highlightRect.style.height = rect.height + 'px';
+    highlightRect.style.width = rect.width + 'px';
+    highlightRect.style.background = '#0d6efd';
     highlightRect.style.opacity = 0.5;
-    highlightRect.style.position = "absolute";
+    highlightRect.style.position = 'absolute';
     highlightRect.style.zIndex = 6;
-    highlightRect.style.cursor = "pointer";
+    highlightRect.style.cursor = 'pointer';
 
-    highlightRect.addEventListener("click", (event) => {
+    highlightRect.addEventListener('click', (event) => {
       const newSelectionState = { event };
 
       getHighlightMemo(title, newSelectionState);
@@ -263,7 +263,7 @@ const deleteMemo = async (memoState) => {
 
   if (result && userInfo) {
     const message = {
-      action: "deleteMemo",
+      action: 'deleteMemo',
       memoId: memoState.title,
       userInfo,
     };
@@ -284,7 +284,7 @@ const closeMemo = async (memoState) => {
 
   if (userInfo) {
     const message = {
-      action: "patchMemo",
+      action: 'patchMemo',
       memoId: memoState.title,
       innerText: memoState.description,
       userInfo,

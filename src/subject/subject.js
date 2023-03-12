@@ -16,7 +16,7 @@ export default class Subject {
     const index = this.observers.indexOf(observer);
 
     if (index > -1) {
-      this.observers[index].update(state, fn1, fn2, fn3);
+      this.observers[index].render(state, fn1, fn2, fn3);
     }
   }
 }

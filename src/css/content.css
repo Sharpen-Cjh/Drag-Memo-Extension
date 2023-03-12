@@ -1,0 +1,57 @@
+.tool-button {
+  border: 1px solid #0d6efd;
+  border-radius: 2px;
+  z-index: 11;
+}
+
+.tool-box {
+  display: flex;
+  flex-direction: row;
+  width: 95px;
+  height: 28px;
+  position: absolute;
+  z-index: 10;
+  background-color: #ffffff;
+}
+
+.memo-editor-header {
+  width: 300px;
+  height: 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5px;
+}
+
+.memo-editor-title {
+  width: 240px;
+  height: 35px;
+  color: #0a0a0a;
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.memo-editor-body {
+  width: 295px;
+  height: 295px;
+  overflow: auto;
+  margin-top: 10px;
+  resize: none;
+}
+
+.memo-editor-container {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  align-items: center;
+  width: 300px;
+  height: 300px;
+  border: 3px solid #0d6efd;
+  border-radius: 5px;
+  background-color: #ffffff;
+  color: #0a0a0a;
+  z-index: 8;
+}
